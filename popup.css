@@ -1,0 +1,353 @@
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    width: 360px; /* Increased slightly for better padding */
+    margin: 0;
+    background-color: #F8F9FA; /* Light off-white/gray background */
+    color: #212529; /* Dark charcoal text */
+    box-sizing: border-box;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.infilter-container {
+    padding: 0; /* Container itself has no padding, sections will */
+    background-color: #FFFFFF; /* Card background */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px; /* Rounded corners for the main card */
+    overflow: hidden; /* To ensure child elements respect border-radius */
+}
+
+.infilter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #dee2e6; /* Light gray border */
+}
+
+.infilter-logo-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.infilter-logo-svg {
+    width: 28px; /* Adjust size as needed */
+    height: 28px;
+}
+
+.infilter-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #3171B7;
+    margin: 0;
+}
+
+.infilter-info-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #6c757d; /* Secondary gray for icon */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.infilter-info-btn:hover {
+    background-color: #e9ecef;
+}
+.infilter-info-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+
+.infilter-tab-nav {
+    display: flex;
+    border-bottom: 1px solid #dee2e6;
+    background-color: #F8F9FA; /* Slightly different bg for tab bar */
+}
+
+.infilter-tab-button {
+    flex-grow: 1;
+    padding: 12px 10px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent; /* For active state underline */
+    color: #6c757d; /* Inactive tab text color */
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    margin-bottom: -1px; /* Overlap border-bottom of nav */
+}
+
+.infilter-tab-button:hover {
+    color: #212529;
+}
+
+.infilter-tab-button.active {
+    color: #3171B7; /* Deep Teal - primary/accent */
+    border-bottom-color: #3171B7;
+    font-weight: 600;
+}
+
+.infilter-tab-content {
+    padding: 20px;
+}
+
+.tab-pane {
+    display: none; /* Hidden by default */
+}
+
+.tab-pane.active {
+    display: block; /* Shown when active */
+}
+
+.infilter-section-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6c757d; /* Secondary gray */
+    margin-bottom: 12px;
+    margin-top: 10px;
+}
+.infilter-section-label:first-child {
+    margin-top: 0;
+}
+
+
+/* Time Filter Specifics */
+.infilter-pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.infilter-time-pill {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    background-color: #e9ecef; /* Light gray for unselected pills */
+    color: #212529;
+    border: 1px solid #dee2e6;
+    border-radius: 16px; /* Pill shape */
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.infilter-time-pill:hover {
+    background-color: #d1d9e0;
+    border-color: #adb5bd;
+}
+
+.infilter-time-pill.active {
+    background-color: #3171B7; /* Deep Teal */
+    color: #FFFFFF;
+    border-color: #3171B7;
+}
+
+#custom-hours-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+}
+#custom-hours-input:focus {
+    border-color: #3171B7;
+    box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2);
+    outline: none;
+}
+
+#apply-time-filter-button,
+#add-company-button,
+.infilter-support-button {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: 600;
+    background-color: #3171B7!important; /* Deep Teal */
+    color: #FFFFFF!important;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+#apply-time-filter-button:hover,
+#add-company-button:hover,
+.infilter-support-button:hover {
+    background-color: #396fa6; /* Darker Teal */
+}
+
+/* Company Blocker Specifics */
+.infilter-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0; /* No gap, button is part of the group */
+    margin-bottom: 16px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    overflow: hidden; /* To contain button border radius */
+}
+.infilter-input-group:focus-within {
+    border-color: #3171B7;
+    box-shadow: 0 0 0 2px rgba(0, 128, 128, 0.2);
+}
+
+
+.infilter-input-group .infilter-input-icon {
+    padding: 0 8px 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    background-color: #ffffff; /* slight bg for icon area */
+}
+.infilter-input-group .infilter-input-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+
+#company-block-input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 14px;
+    border: none; /* Border handled by parent group */
+    border-radius: 0;
+    box-sizing: border-box;
+    outline: none;
+}
+
+#add-company-button {
+    width: auto; /* Fit content */
+    border-radius: 0 4px 4px 0; /* Rounded corners only on the right */
+    padding: 10px 14px;
+}
+
+#blocked-companies-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    max-height: 120px; /* Adjust as needed */
+    overflow-y: auto;
+    border-radius: 4px;
+    background-color: #F8F9FA; /* Slightly different bg for the list */
+    padding: 8px;
+    border: 1px solid #e1e4e8;
+}
+
+.company-tag {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    background-color: #e9ecef; 
+    color: #212529;
+    border: 1px solid #dee2e6;
+    padding: 6px 12px 6px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background-color 0.4s ease;
+
+}
+
+.company-name-tag {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px; /* Adjust based on popup width and padding */
+}
+
+.remove-tag-icon {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 14px;
+    height: 14px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    border: aliceblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    opacity: 0; 
+    visibility: hidden;
+    line-height: 1;
+    cursor: pointer;
+}
+.company-tag:hover {
+    background-color: #d1d9e0;
+    border-color: #adb5bd;
+    cursor: pointer;
+}
+.company-tag:hover .remove-tag-icon {
+    opacity: 1; 
+    visibility: visible; 
+    animation: fadeIn 0.2s ease-in-out;
+    border: #3171B7;
+    cursor: pointer;
+}
+
+.empty-blocklist-message {
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    color: #6c757d;
+    padding: 10px 0;
+    font-size: 13px;
+}
+
+/* Info Tab Specifics */
+.infilter-support-button {
+    background-color: #FFFFFF;
+    color: #3171B7;
+    border: 1px solid #3171B7;
+    margin-bottom: 15px;
+}
+.infilter-support-button:hover {
+    background-color: rgba(0, 128, 128, 0.05);
+}
+
+.infilter-disclaimer,
+.infilter-version {
+    font-size: 12px;
+    color: #6c757d;
+    text-align: center;
+    margin-bottom: 5px;
+}
+.infilter-version {
+    margin-top: 10px;
+}
+.privacy-statement {
+    text-align: left;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #F8F9FA;
+    border-radius: 6px;
+    border: 1px solid #e1e4e8;
+    line-height: 1.4;
+}
