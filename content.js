@@ -275,7 +275,7 @@ try {
             setTimeout(() => {
                 applyCompanyBlocklist("init_extended_fallback");
                 updateLinkedInTimeFilterDisplay();
-            }, INITIAL_OBSERVER_SETUP_DELAY * 2.5); 
+            }, INITIAL_OBSERVER_SETUP_DELAY * 3.5); 
 
             if (periodicCheckIntervalId) clearInterval(periodicCheckIntervalId);
             periodicCheckIntervalId = setInterval(() => handlePotentialFilterOrPageChange("periodic_check"), URL_CHECK_INTERVAL);
