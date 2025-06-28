@@ -1,7 +1,10 @@
 
+
 // handles the icon's visual active inactive state (color vs. grayscale)
 
 let iconsData = {};
+// A persistent store for the last known badge count for each tab.
+let tabBadgeCounts = {};
 
 async function generateIconImageData() {
 
@@ -63,18 +66,53 @@ async function updateActionState(tab) {
   if (isLinkedIn) {
     setActionIcon(tab.id, 'color');
     await chrome.action.enable(tab.id);
+
+    // Restore the badge from memory if it exists for this tab
+    const lastCount = tabBadgeCounts[tab.id] || 0;
+    const text = lastCount > 0 ? String(lastCount) : '';
+    try {
+        await chrome.action.setBadgeText({ tabId: tab.id, text: text });
+    } catch(e) { /* Tab might be gone */ }
   } else {
     setActionIcon(tab.id, 'gray');
     await chrome.action.disable(tab.id);
+    
+    // Clear the badge and the stored count when not on LinkedIn
+    try {
+      await chrome.action.setBadgeText({ tabId: tab.id, text: '' });
+      delete tabBadgeCounts[tab.id]; // Clean up memory
+    } catch(e) { /* Tab might be gone */ }
   }
 }
 
+// --- Event Listeners ---
 
+// Listen for messages from content scripts (e.g., to update the badge)
+chrome.runtime.onMessage.addListener((message, sender) => {
+  if (message.type === 'UPDATE_BADGE' && sender.tab && sender.tab.id) {
+    const tabId = sender.tab.id;
+    const count = message.count || 0;
+    const text = count > 0 ? String(count) : '';
+    
+    // Store the latest count for this tab for persistence during navigation
+    tabBadgeCounts[tabId] = count;
+    
+    // Set badge text for the specific tab that sent the message
+    chrome.action.setBadgeText({
+      tabId: tabId,
+      text: text
+    });
+  }
+});
+
+
+// Initialize icons when the service worker first starts up.
 generateIconImageData();
 
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.url) {
+  // Use 'loading' status to update the icon state as early as possible
+  if (changeInfo.status === 'loading' && tab.url) {
     updateActionState(tab);
   }
 });
@@ -88,8 +126,18 @@ chrome.tabs.onActivated.addListener(activeInfo => {
   });
 });
 
+// Fired when a tab is closed.
+chrome.tabs.onRemoved.addListener((tabId) => {
+  // Clean up the stored count for the closed tab to prevent memory leaks.
+  delete tabBadgeCounts[tabId];
+});
+
 // Fired when the extension is first installed or updated.
 chrome.runtime.onInstalled.addListener(() => {
+  // Set the badge background color
+  chrome.action.setBadgeBackgroundColor({ color: '#6c757d' }); // A neutral gray from the popup CSS
+
+  // Ensure all currently open tabs have the correct icon state.
   chrome.tabs.query({}, tabs => {
     if (!chrome.runtime.lastError) {
       for (const tab of tabs) {
