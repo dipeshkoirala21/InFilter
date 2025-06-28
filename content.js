@@ -1,4 +1,5 @@
 
+
 try {
     let companyBlocklist = []; // Global scope
     let applyBlocklistDebounceTimer;
@@ -16,7 +17,6 @@ try {
         try {
             const result = await chrome.storage.local.get(['companyBlocklist']);
             companyBlocklist = (result.companyBlocklist || []).map(name => String(name).trim().toLowerCase()).filter(name => name.length > 0);
-            // console.log("LJF: Blocklist loaded:", companyBlocklist);
         } catch (error) {
             companyBlocklist = [];
         }
@@ -34,38 +34,57 @@ try {
             li.removeAttribute('data-infilter-hidden');
         });
 
-        if (companyBlocklist.length === 0) {
-            return; // No companies to block, ensure everything is visible
-        }
-
-        const useFuzzyMatch = window.location.href === 'https://www.linkedin.com/jobs/';
-
-        const allUlElements = document.querySelectorAll('ul');
         let hiddenCount = 0;
 
-        allUlElements.forEach(ul => {
-            // Iterate over direct children of the UL that are LIs
-            for (const li of ul.children) {
-                if (li.tagName === 'LI' && !li.hasAttribute('data-infilter-hidden')) {
-                    const liText = li.textContent?.trim().toLowerCase();
-                    if (!liText) {
-                        continue; // Skip LIs with no text content
-                    }
-                    for (const blockedCompany of companyBlocklist) {
-                        
-                        if (liText.includes(blockedCompany)) {
-                            li.style.setProperty('display', 'none', 'important');
-                            li.setAttribute('data-infilter-hidden', 'true');
-                            hiddenCount++;
-                            break; // Found a blocked company, no need to check other companies for this LI
+        if (companyBlocklist.length > 0) {
+            const allUlElements = document.querySelectorAll('ul');
+
+            allUlElements.forEach(ul => {
+                for (const li of ul.children) {
+                    if (li.tagName === 'LI' && !li.hasAttribute('data-infilter-hidden')) {
+                        const liText = li.textContent?.trim().toLowerCase();
+                        if (!liText) {
+                            continue;
+                        }
+                        for (const blockedCompany of companyBlocklist) {
+                            if (liText.includes(blockedCompany)) {
+                                li.style.setProperty('display', 'none', 'important');
+                                li.setAttribute('data-infilter-hidden', 'true');
+                                hiddenCount++;
+                                break;
+                            }
                         }
                     }
                 }
+            });
+        }
+        
+        // --- BADGE COUNTER LOGIC ---
+        let shouldSendUpdate = true;
+        // If the count is 0, we must be careful not to reset the badge during a page load.
+        if (hiddenCount === 0) {
+            // Check if a known LinkedIn loading spinner is visible on the page.
+            const loadingSpinnerSelectors = [
+                '.jobs-search-results-list__loading',
+                '.artdeco-spinner',
+                '[role="progressbar"]'
+            ];
+            if (document.querySelector(loadingSpinnerSelectors.join(','))) {
+                // A spinner is active, so this is likely a page transition.
+                // Suppress the "0" update to prevent the badge from blinking.
+                shouldSendUpdate = false;
             }
-        });
+        }
 
-        if (hiddenCount > 0) {
-            console.log(`LJF: applyCompanyBlocklist (from ${callSource}) hid ${hiddenCount} LIs based on ul > li text content.`);
+        if (shouldSendUpdate) {
+            try {
+                chrome.runtime.sendMessage({ type: 'UPDATE_BADGE', count: hiddenCount });
+            } catch (e) {
+                // This error ("context invalidated") is expected during page navigation and can be safely ignored.
+                if (e.message && !e.message.includes("Extension context invalidated")) {
+                    console.error("InFilter: Error sending badge update:", e);
+                }
+            }
         }
     }
 
@@ -88,7 +107,6 @@ try {
     
             const displayHoursText = (hours === 1) ? "Past hour" : `Past ${hours} hours`;
     
-            // 1. Update the top filter pill (the green/blue one)
             const topPillSelectors = [
                 'button.search-reusables__filter-pill--active[id*="date-posted"]',
                 'button.artdeco-pill--selected[id*="date-posted"]',
@@ -108,26 +126,22 @@ try {
                 }
             }
     
-            // 2. Update the radio button label in the side panel OR the top dropdown filter.
-            // This is the robust fix. It finds the specific input by ID derived from the URL's time value.
             const inputId = `timePostedRange-r${seconds}`;
             const radioInput = document.getElementById(inputId);
     
             if (radioInput) {
-                const listItem = radioInput.closest('li'); // Get the parent <li> container
+                const listItem = radioInput.closest('li');
                 if (listItem) {
-                    // Find the text span within this specific list item.
-                    // This handles both the dropdown filter and the sidebar filter layouts.
                     const textSpanSelectors = [
-                        'label span.t-14.t-black--light.t-normal', // Dropdown from user's HTML
-                        'label span.artdeco-facet-filter-value-label__text' // Sidebar filter
+                        'label span.t-14.t-black--light.t-normal',
+                        'label span.artdeco-facet-filter-value-label__text'
                     ];
             
                     for (const selector of textSpanSelectors) {
                         const textSpan = listItem.querySelector(selector);
                         if (textSpan && textSpan.textContent.trim() !== displayHoursText) {
                             textSpan.textContent = displayHoursText;
-                            break; // Found and updated, no need to check other selectors
+                            break;
                         }
                     }
                 }
@@ -157,7 +171,6 @@ try {
             if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
                  for (const addedNode of mutation.addedNodes) {
                     if (addedNode.nodeType === Node.ELEMENT_NODE) {
-                        // Check if the added node is a UL, an LI, or contains ULs/LIs
                         if (addedNode.matches && (addedNode.matches('ul, li') || addedNode.querySelector('ul, li'))) {
                              hasRelevantChanges = true;
                              break;
@@ -168,7 +181,6 @@ try {
                 const textNodeContainingElement = mutation.target.parentElement;
                 if (textNodeContainingElement) {
                     const closestLi = textNodeContainingElement.closest('li');
-                    // Check if this LI is a direct child of a UL
                     if (closestLi && closestLi.parentElement && closestLi.parentElement.tagName === 'UL') {
                         hasRelevantChanges = true;
                     }
@@ -184,7 +196,6 @@ try {
                 updateLinkedInTimeFilterDisplay();
 
                 if (currentObserverTargetNode && !currentObserverTargetNode.isConnected) {
-                    console.warn("LJF MutationObserver: Target node disconnected. Re-initializing observer.");
                     if(observer) observer.disconnect();
                     currentObserverTargetNode = null;
                     attemptToSetupObserver(1);
@@ -199,7 +210,7 @@ try {
                 observer.observe(currentObserverTargetNode, { childList: true, subtree: true, characterData: true }); 
                 return;
             } catch(e) {
-                currentObserverTargetNode = null; // Reset if observe fails
+                currentObserverTargetNode = null;
             }
         }
 
@@ -222,14 +233,12 @@ try {
         if (targetNode) {
             currentObserverTargetNode = targetNode;
             observer.observe(currentObserverTargetNode, { childList: true, subtree: true, characterData: true });
-            // console.log("LJF: MutationObserver setup complete on:", currentObserverTargetNode.nodeName);
         } else {
             if (attempt < MAX_OBSERVER_SETUP_ATTEMPTS) {
                 setTimeout(() => attemptToSetupObserver(attempt + 1), OBSERVER_SETUP_RETRY_DELAY);
             } else {
                 currentObserverTargetNode = document.documentElement; 
                 observer.observe(currentObserverTargetNode, { childList: true, subtree: true, characterData: true });
-                console.warn("LJF: MutationObserver setup complete on FALLBACK target: documentElement.");
             }
         }
         lastProcessedHref = window.location.href;
@@ -237,7 +246,6 @@ try {
 
     function handlePotentialFilterOrPageChange(source = "unknown_source") {
         if (window.location.href !== lastProcessedHref) {
-            // console.log(`LJF: URL change detected (from ${source}). Applying filters.`);
             lastProcessedHref = window.location.href;
 
             setTimeout(() => {
@@ -251,7 +259,7 @@ try {
                 attemptToSetupObserver(1);
             }, 750); 
         } else {
-             if (source === "periodic_check") { // Only re-apply if not a URL change to avoid double runs
+             if (source === "periodic_check") {
                 applyCompanyBlocklist("periodic_reapply");
                 updateLinkedInTimeFilterDisplay();
              }
@@ -259,7 +267,6 @@ try {
     }
 
     async function init() {
-        // console.log("LJF: init() called.");
         try {
             await loadBlocklist();
             lastProcessedHref = window.location.href;
@@ -271,7 +278,6 @@ try {
                 attemptToSetupObserver();
             }, INITIAL_OBSERVER_SETUP_DELAY);
 
-            // Additional fallback application after a longer delay, in case initial DOM isn't fully ready
             setTimeout(() => {
                 applyCompanyBlocklist("init_extended_fallback");
                 updateLinkedInTimeFilterDisplay();
