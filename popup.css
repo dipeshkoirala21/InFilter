@@ -351,3 +351,30 @@ body {
     border: 1px solid #e1e4e8;
     line-height: 1.4;
 }
+
+.infilter-source-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.infilter-source-link a {
+    color: #3171B7;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.infilter-source-link a:hover {
+    text-decoration: underline;
+}
+
+.infilter-source-link .github-icon {
+    width: 14px;
+    height: 14px;
+}
