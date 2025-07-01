@@ -3,7 +3,7 @@
   "name": "InFilter (Advanced Job Filter for LinkedIn)",
   "version": "1.0",
   "description": "Filters LinkedIn job postings by specific hours and blocks unwanted job posters.",
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": ["storage", "activeTab"],
   "host_permissions": [
     "https://*.linkedin.com/*"
   ],
