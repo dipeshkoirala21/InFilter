@@ -22,7 +22,7 @@ LinkedIn's default search only allows filtering jobs posted in the "Past 24 hour
 
 ### From Your Browser's Web Store
 
-*(Links to be added once published)*
+[*(Link)*:](https://chromewebstore.google.com/detail/keomcieggcchjkicfgokoccgbhgnnmhf?utm_source=item-share-cb)
 
 1.  Visit the InFilter page on the **Chrome Web Store** or **Microsoft Edge Add-ons**.
 2.  Click **"Add to Chrome"** or **"Get"**.
